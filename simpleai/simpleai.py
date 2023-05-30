@@ -45,17 +45,24 @@ class SimpleAI:
 
     """
 
-def __init__(self, backEnd: AIBackEndType, AccessToken: str, model: str = ''):
-    self.backEnd = backEnd
-    self.AccessToken = AccessToken
-    if not model:
+    def __init__(self, backEnd: AIBackEndType, AccessToken: str, model: str = ''):
+        self.backEnd = backEnd
+        self.AccessToken = AccessToken
         if self.backEnd == AIBackEndType.OpenAI:
-            self.model = 'chatgpt3.5'
-        elif self.backEnd == AIBackEndType.Poe:
-            self.model = 'capybara'
-        elif self.backEnd == AIBackEndType.LLAMACPP:
-            self.model = 'default.bin'
-    else:
-        self.model = model
+            openai.api_key = AccessToken
+        if not model:
+            if self.backEnd == AIBackEndType.OpenAI:
+                self.model = 'gpt-3.5-turbo'
+            elif self.backEnd == AIBackEndType.Poe:
+                self.model = 'capybara'
+            elif self.backEnd == AIBackEndType.LLAMACPP:
+                self.model = 'default.bin'
+        else:
+            self.model = model
 
-
+    def reply(self, message):
+        if self.backEnd == AIBackEndType.OpenAI:
+            response = openai.ChatCompletion.create(model=self.model, 
+                                                    messages=[{"role": "user", 
+                                                                "content": message}])
+            return response['choices'][0]['message']['content']

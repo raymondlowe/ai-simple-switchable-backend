@@ -1,9 +1,9 @@
 import os
-from simpleai import SimpleAI
-from simpleai import AIBackEndType as BackEnd
+from simpleai.simpleai import SimpleAI
+from simpleai.simpleai import AIBackEndType as BackEnd
 
 def test_simple_ai():
-    """Test creating a SimpleAI instance"""
+    """Test creating a SimpleAI instance and getting a reply from the AI"""
 
     # Get the access token from an environment variable
     access_token = os.environ.get('OpenAIKey')
@@ -14,3 +14,10 @@ def test_simple_ai():
     # Make sure the backend and access token were set correctly
     assert ai.backEnd == BackEnd.OpenAI
     assert ai.AccessToken == access_token
+
+    # Test getting a response from the AI
+    response = ai.reply("hello")
+    assert isinstance(response, str)
+    print(response)
+
+test_simple_ai()

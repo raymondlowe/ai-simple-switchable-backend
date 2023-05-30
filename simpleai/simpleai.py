@@ -49,7 +49,14 @@ class SimpleAI:
         self.backEnd = backEnd
         self.AccessToken = AccessToken
         if self.backEnd == AIBackEndType.OpenAI:
-            openai.api_key = AccessToken
+            openai.api_key = self.backEndAccessToken
+        if self.backEnd == AIBackEndType.Poe:
+            # create poe object
+            self.poeclient = poe.Client(AccessToken)
+            pass
+        if self.backEnd == AIBackEndType.LLAMACPP:
+            # create the llama
+            pass
         if not model:
             if self.backEnd == AIBackEndType.OpenAI:
                 self.model = 'gpt-3.5-turbo'
@@ -57,12 +64,25 @@ class SimpleAI:
                 self.model = 'capybara'
             elif self.backEnd == AIBackEndType.LLAMACPP:
                 self.model = 'default.bin'
+                
         else:
             self.model = model
 
-    def reply(self, message):
+    def reply(self, message, clear_conversation: bool = False):
         if self.backEnd == AIBackEndType.OpenAI:
             response = openai.ChatCompletion.create(model=self.model, 
                                                     messages=[{"role": "user", 
                                                                 "content": message}])
             return response['choices'][0]['message']['content']
+
+        if self.backEnd == AIBackEndType.Poe:
+            for chunk in self.poeclient.send_message(self.model, message, clear_conversation, timeout = 20):
+                pass
+            response = chunk['text']
+
+            return response
+        
+        if self.backEnd == AIBackEndType.LLAMACPP:
+            pass
+        
+
